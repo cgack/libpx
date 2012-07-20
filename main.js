@@ -34,8 +34,12 @@ var g_resources = [
         name: "house",
         type: "image",
         src: "assets/house.png"
+    },
+    {
+        name: "magic_firelion_sheet",
+        type: "image",
+        src: "assets/magic/magic_firelion_sheet.png"
     }
-
     ];
  
 var jsApp = {
@@ -84,6 +88,7 @@ var jsApp = {
 // add our player entity in the entity pool
         me.entityPool.add("mainPlayer", PlayerEntity);
         me.entityPool.add("EnemyEntity", EnemyEntity);
+        me.entityPool.add("MagicEntity", MagicEntity);
 
         // enable the keyboard
         me.input.bindKey(me.input.KEY.LEFT, "left");
@@ -186,6 +191,9 @@ var PlayerEntity = me.ObjectEntity.extend({
         if (me.input.isKeyPressed('fire')) {
             this.isFiring = true;
             this.setVelocity(0,0);
+            magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, {});
+            me.game.add(magic, this.z);
+            me.game.sort();
         } else {
             this.isFiring = false;
             this.setVelocity(3,3);
@@ -256,6 +264,32 @@ var PlayerEntity = me.ObjectEntity.extend({
     
 });
 
+var MagicEntity = me.ObjectEntity.extend({
+    init: function(x, y, settings) {
+        settings.image = "magic_firelion_sheet";
+        settings.spritewidth = 64;
+        settings.spriteheight = 64;
+
+        this.parent(x,y,settings);
+
+        this.gravity = 0;
+        //this.setVelocity(3,0);
+        //this.vel.x = 0.1;
+
+        this.addAnimation("fire", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);
+
+        this.type = me.game.MAGIC_OBJECT;
+
+    },
+    update: function() {
+
+        this.setCurrentAnimation("fire", function() { me.game.remove(this);});
+
+        this.updateMovement();
+            this.parent(this);
+            return true;
+    }
+});
 
 var EnemyEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
