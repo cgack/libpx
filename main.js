@@ -16,6 +16,16 @@ var g_resources = [
         src: "assets/grass.png"
     },
     {
+        name: "fence",
+        type: "image",
+        src: "assets/fence.png"
+    },
+    {
+        name: "dirt2",
+        type: "image",
+        src: "assets/dirt2.png"
+    },
+    {
         name: "test1",
         type: "tmx",
         src: "test1.tmx"
@@ -39,6 +49,36 @@ var g_resources = [
         name: "magic_firelion_sheet",
         type: "image",
         src: "assets/magic/magic_firelion_sheet.png"
+    },
+    {
+        name: "32x32_font",
+        type: "image",
+        src: "assets/32x32_font.png"
+    },
+    {
+        name: "metatiles32x32",
+        type: "image",
+        src: "assets/metatiles32x32.png"
+    },
+    {
+        name: "tileset01",
+        type: "image",
+        src: "assets/tileset01.png"
+    },
+    {
+        name: "water",
+        type: "image",
+        src: "assets/water.png"
+    },
+    {
+        name: "waterfall",
+        type: "image",
+        src: "assets/waterfall.png"
+    },
+    {
+        name: "watergrass",
+        type: "image",
+        src: "assets/watergrass.png"
     }
     ];
  
@@ -51,18 +91,13 @@ var jsApp = {
     onload: function() {
  
         // init the video
-        if (!me.video.init('jsapp', 640/*window.innerWidth*/, 480 /*window.innerHeight*/, false, 1.0)) {
+        if (!me.video.init('jsapp', 720/*window.innerWidth*/, 640 /*window.innerHeight*/, false, 1.0)) {
             alert("Sorry but your browser does not support html 5 canvas.");
             return;
         }
         me.sys.useNativeAnimFrame = true;
         me.sys.fps = 30;
         //me.debug.renderHitBox = true;
-
-        // add a default HUD to the game mngr (with no background)
-        //me.game.addHUD(0,0,480,100);
-        // add the "score" HUD item
-        //me.game.HUD.addItem("score", new ScoreObject(470,10));
         // initialize the "audio"
         me.audio.init("mp3,ogg");
  
@@ -111,6 +146,12 @@ var PlayScreen = me.ScreenObject.extend({
     onResetEvent: function() {
         // stuff to reset on state change
         me.levelDirector.loadLevel("test1");
+         // add a default HUD to the game mngr (with no background)
+        me.game.addHUD(0,0,640,100);
+        // add the "score" HUD item
+        me.game.HUD.addItem("score", new ScoreObject(500,30));
+        me.game.HUD.addItem("health", new ScoreObject(20, 30));
+        me.game.HUD.setItemValue("health", 100);
     },
  
     /* ---
@@ -123,6 +164,34 @@ var PlayScreen = me.ScreenObject.extend({
  
 });
 
+var MenuScreen = me.ScreenObject.extend({
+    init: function() {
+        this.parent(true);
+        this.title = null;
+        this.font = "Helvetica";
+
+
+    },
+    onResetEvent: function() {
+        if (this.title === null) {
+            this.title = me.getLoader
+        }
+    }
+})
+
+var ScoreObject = me.HUD_Item.extend({
+   init: function(x, y) {
+        // call the parent constructor
+        this.parent(x, y);
+        // create a font
+        //this.font = new me.BitmapFont("32x32_font", 32);
+        this.font = new me.Font("Helvetica", 32, "white", "left");
+    },
+ 
+    draw: function(context, x, y) {
+        this.font.draw(context, this.value, this.pos.x + x, this.pos.y + y);
+    }
+});
 /*player*/
 var PlayerEntity = me.ObjectEntity.extend({
 
@@ -153,6 +222,8 @@ var PlayerEntity = me.ObjectEntity.extend({
 
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
 
+        this.type = me.game.PLAYER_MAIN;
+
     },
 
     /* -----
@@ -174,6 +245,11 @@ var PlayerEntity = me.ObjectEntity.extend({
             // if we collide with an enemy
             if (res.obj.type == me.game.ENEMY_OBJECT) {
                     this.flicker(45);
+                    if (this.isFiring) {
+                        me.game.HUD.updateItemValue("score", 25);
+                    } else {
+                        me.game.HUD.updateItemValue("health", -1);
+                    }
             }
         }
  
@@ -191,7 +267,13 @@ var PlayerEntity = me.ObjectEntity.extend({
         if (me.input.isKeyPressed('fire')) {
             this.isFiring = true;
             this.setVelocity(0,0);
-            magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, {});
+            
+            if (this.direction === "west") {
+                magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, {});
+                magic.flipX(true);
+            } else if (this.direction === "east") {
+                magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, {});
+            }
             me.game.add(magic, this.z);
             me.game.sort();
         } else {
@@ -275,6 +357,7 @@ var MagicEntity = me.ObjectEntity.extend({
         this.gravity = 0;
         //this.setVelocity(3,0);
         //this.vel.x = 0.1;
+        this.collidable = true;
 
         this.addAnimation("fire", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);
 
@@ -315,14 +398,17 @@ var EnemyEntity = me.ObjectEntity.extend({
         this.addAnimation("east", [28,29,30,31,32,33,34,35]);
 
         this.startX = x;
+        this.startY = y;
+
+        this.health = 100;
+
+        this.endY = y + settings.height - settings.spriteheight;
         this.endX = x + settings.width - settings.spritewidth;
 
         this.pos.x = x + settings.width - settings.spritewidth;
-        this.walkLeft = true;
-
+        this.setCurrentAnimation("east");
         this.collidable = true;
 
-//        var res = me.game.collide(res)
 
         this.type = me.game.ENEMY_OBJECT;
 
@@ -331,21 +417,39 @@ var EnemyEntity = me.ObjectEntity.extend({
         //we should do something here
     },
     update: function() {
-        this.setCurrentAnimation("east");
-        if (this.walkLeft && this.pos.x <= this.startX) {
-            this.walkLeft = false;
-        } else if (!this.walkLeft && this.pos.x >= this.endX) {
-            this.walkLeft = true;
+        
+        if (this.pos.x <= this.startX) {
+            this.vel.x += this.accel.x * me.timer.tick;
+            this.setCurrentAnimation("east");
+        } else if (this.pos.x >= this.endX) {
+            this.vel.x -= this.accel.x * me.timer.tick;
+            this.setCurrentAnimation("west");
+        } else if (this.pos.y >= this.endY) {
+            this.vel.y -= this.accel.y * me.timer.tick;
+            this.setCurrentAnimation("north");
+        } else if (this.pos.y <= this.startY) {
+            this.vel.y += this.accel.y * me.timer.tick;
+            this.setCurrentAnimation("south");
         }
-        this.doWalk(this.walkLeft);
+
+        var res = me.game.collide(this);
+
+        if (res) {
+            // if we collide with an enemy
+            if (res.obj.type == me.game.MAGIC_OBJECT) {
+                me.game.HUD.updateItemValue("score", 25);
+                this.health = this.health - 2;
+                if (this.health <= 0) {
+                    me.game.remove(this);
+                }
+            }
+        }
+ 
 
         this.updateMovement();
 
-        if (this.vel.x !== 0 || this.vel.y !== 0) {
-            this.parent(this);
-            return true;
-        }
-        return false;
+        this.parent(this);
+        return true;
     }
 });
 
