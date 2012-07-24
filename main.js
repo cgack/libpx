@@ -79,6 +79,11 @@ var g_resources = [
         name: "watergrass",
         type: "image",
         src: "assets/watergrass.png"
+    },
+    {
+        name:"lpc_home_cup",
+        type: "image",
+        src: "assets/lpc_home_cup.png"
     }
     ];
  
@@ -91,12 +96,12 @@ var jsApp = {
     onload: function() {
  
         // init the video
-        if (!me.video.init('jsapp', 720/*window.innerWidth*/, 640 /*window.innerHeight*/, false, 1.0)) {
+        if (!me.video.init('jsapp', 720/*window.innerWidth*/, 480 /*window.innerHeight*/, false, 1.0)) {
             alert("Sorry but your browser does not support html 5 canvas.");
             return;
         }
         me.sys.useNativeAnimFrame = true;
-        me.sys.fps = 30;
+        me.sys.fps = 60;
         //me.debug.renderHitBox = true;
         // initialize the "audio"
         me.audio.init("mp3,ogg");
@@ -117,9 +122,19 @@ var jsApp = {
  
      --- */
     loaded: function() {
+        //MENU Screen
+        me.game.PLAYER_IS_ALIVE = true;
+        me.game.BAD_GUY_COUNT = 7;
+        me.game.GAME_IS_WON = false;
+
+        me.state.set(me.state.MENU, new MenuScreen());
         // set the "Play/Ingame" Screen Object
         me.state.set(me.state.PLAY, new PlayScreen());
- 
+
+
+        me.state.set(me.state.LOSE, new MenuScreen());
+        me.state.set(me.state.WIN, new MenuScreen());
+
 // add our player entity in the entity pool
         me.entityPool.add("mainPlayer", PlayerEntity);
         me.entityPool.add("EnemyEntity", EnemyEntity);
@@ -135,7 +150,7 @@ var jsApp = {
         me.input.bindMouse(me.input.mouse.LEFT, me.input.KEY.X);
 
         // start the game
-        me.state.change(me.state.PLAY);
+        me.state.change(me.state.MENU);
     }
  
 };
@@ -147,10 +162,12 @@ var PlayScreen = me.ScreenObject.extend({
         // stuff to reset on state change
         me.levelDirector.loadLevel("test1");
          // add a default HUD to the game mngr (with no background)
-        me.game.addHUD(0,0,640,100);
-        // add the "score" HUD item
-        me.game.HUD.addItem("score", new ScoreObject(500,30));
-        me.game.HUD.addItem("health", new ScoreObject(20, 30));
+        if (!me.game.HUD) {
+            me.game.addHUD(0,0,640,100);
+            // add the "score" HUD item
+            me.game.HUD.addItem("score", new ScoreObject(500,30));
+            me.game.HUD.addItem("health", new ScoreObject(20, 30));
+        }
         me.game.HUD.setItemValue("health", 100);
     },
  
@@ -168,16 +185,36 @@ var MenuScreen = me.ScreenObject.extend({
     init: function() {
         this.parent(true);
         this.title = null;
-        this.font = "Helvetica";
+        this.font = new me.Font("Helvetica", 48, "white", "center");
 
 
     },
     onResetEvent: function() {
         if (this.title === null) {
-            this.title = me.getLoader
+            this.title = me.loader.getImage("lpc_home_cup");
         }
+        me.input.bindKey(me.input.KEY.ENTER,"enter",true);
+    },
+    update: function() {
+        if (me.input.isKeyPressed("enter")) {
+            me.game.PLAYER_IS_ALIVE = true;
+            me.state.change(me.state.PLAY);
+        }
+        return true;
+    },
+    draw: function(context) {
+        context.drawImage(this.title, 0, 0);
+        if (!me.game.PLAYER_IS_ALIVE) {
+            this.font.draw(context, "You Lost!", 200, 300);
+        } else if (me.game.GAME_IS_WON) {
+            this.font.draw(context, "YOU WON!!", 200, 300);
+        }
+        this.font.draw(context, "PRESS ENTER TO PLAY", 80, 400);
+    },
+    onDestroyEvent: function() {
+        me.input.unbindKey(me.input.KEY.ENTER);
     }
-})
+});
 
 var ScoreObject = me.HUD_Item.extend({
    init: function(x, y) {
@@ -200,10 +237,11 @@ var PlayerEntity = me.ObjectEntity.extend({
 
         this.updateColRect(8,48,10,54);
 //defaults
-        this.setVelocity(1.5,1.5);
-        this.setFriction(0.1, 0.1);
+        this.setVelocity(0,0);
+        this.setFriction(0.22, 0.22);
         this.gravity = 0;
         this.direction = "south";
+        this.health = 100;
         
         this.addAnimation("stand-n", [0]);
         this.addAnimation("stand-s", [18]);
@@ -249,6 +287,14 @@ var PlayerEntity = me.ObjectEntity.extend({
                         me.game.HUD.updateItemValue("score", 25);
                     } else {
                         me.game.HUD.updateItemValue("health", -1);
+
+                        this.health = this.health  - 1;
+
+                        if (this.health === 0) {
+                            me.game.PLAYER_IS_ALIVE = false;
+                            me.state.change(me.game.LOSE);
+                        }
+
                     }
             }
         }
@@ -439,8 +485,13 @@ var EnemyEntity = me.ObjectEntity.extend({
             if (res.obj.type == me.game.MAGIC_OBJECT) {
                 me.game.HUD.updateItemValue("score", 25);
                 this.health = this.health - 2;
-                if (this.health <= 0) {
+                if (this.health === 0) {
                     me.game.remove(this);
+                    me.game.BAD_GUY_COUNT--;
+                    if (me.game.BAD_GUY_COUNT === 0) {
+                        me.game.GAME_IS_WON = true;
+                        me.state.change(me.game.WIN);
+                    }
                 }
             }
         }
