@@ -5819,7 +5819,7 @@
 			 * @name me.HUD_Item#value
 			 */
 
-			this.value = val || 0;
+			this.value = val;
 
 			this.updated = true;
 		},
@@ -5845,9 +5845,19 @@
 		 * @param {int} value add the specified value
 		 */
 		update : function(value) {
-			return this.set(this.value + value);
+			if (this.isNumber(value)) {
+				return this.set(this.value + value);
+			} else {
+				return this.set(value)	;
+			}
 		},
-
+		/**
+		check if is number 
+		**/
+		isNumber: function(n) {
+  			return !isNaN(parseFloat(n)) && isFinite(n);
+		},
+	
 		/**
 		 * draw the HUD item
 		 * @protected
@@ -5931,8 +5941,7 @@
 			this.z = 999;
 
 		},
-
-		/**
+/**
 		 * add an item to the me.game.HUD Object
 		 * @name me.HUD_Object#addItem
 		 * @public
@@ -5949,11 +5958,9 @@
 			this.objCount++;
 			this.HUD_invalidated = true;
 		},
-		
 		/**
-		 * remove an item from the me.game.HUD Object
-		 * @name me.HUD_Object#removeItem
-		 * @public
+		 * add an item to the me.game.HUD Object
+		 * @name me.HUD_Object#addItempublic
 		 * @function
 		 * @param {String} name name of the item
 		 * @example

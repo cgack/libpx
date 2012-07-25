@@ -101,7 +101,7 @@ var jsApp = {
             return;
         }
         me.sys.useNativeAnimFrame = true;
-        me.sys.fps = 60;
+        me.sys.fps = 30;
         //me.debug.renderHitBox = true;
         // initialize the "audio"
         me.audio.init("mp3,ogg");
@@ -126,6 +126,7 @@ var jsApp = {
         me.game.PLAYER_IS_ALIVE = true;
         me.game.BAD_GUY_COUNT = 7;
         me.game.GAME_IS_WON = false;
+        me.game.MESSAGE_IS_SHOWING = false;
 
         me.state.set(me.state.MENU, new MenuScreen());
         // set the "Play/Ingame" Screen Object
@@ -141,11 +142,11 @@ var jsApp = {
         me.entityPool.add("MagicEntity", MagicEntity);
 
         // enable the keyboard
-        me.input.bindKey(me.input.KEY.LEFT, "left");
-        me.input.bindKey(me.input.KEY.RIGHT, "right");
-        me.input.bindKey(me.input.KEY.UP, "up");
-        me.input.bindKey(me.input.KEY.DOWN, "down");
-        me.input.bindKey(me.input.KEY.SPACE, "fire");
+        me.input.bindKey(me.input.KEY.A, "left");
+        me.input.bindKey(me.input.KEY.D, "right");
+        me.input.bindKey(me.input.KEY.W, "up");
+        me.input.bindKey(me.input.KEY.S, "down");
+        me.input.bindKey(me.input.KEY.O, "fire");
         me.input.bindKey(me.input.KEY.X, "mouseOverride");
         me.input.bindMouse(me.input.mouse.LEFT, me.input.KEY.X);
 
@@ -163,12 +164,15 @@ var PlayScreen = me.ScreenObject.extend({
         me.levelDirector.loadLevel("test1");
          // add a default HUD to the game mngr (with no background)
         if (!me.game.HUD) {
-            me.game.addHUD(0,0,640,100);
+            me.game.addHUD(0,0,720,480);
             // add the "score" HUD item
             me.game.HUD.addItem("score", new ScoreObject(500,30));
             me.game.HUD.addItem("health", new ScoreObject(20, 30));
+            me.game.HUD.addItem("message", new MessageObject(340,400));
         }
         me.game.HUD.setItemValue("health", 100);
+        me.game.HUD.setItemValue("score", 0);
+        me.game.HUD.setItemValue("message", "");
     },
  
     /* ---
@@ -229,14 +233,27 @@ var ScoreObject = me.HUD_Item.extend({
         this.font.draw(context, this.value, this.pos.x + x, this.pos.y + y);
     }
 });
-/*player*/
+
+var MessageObject = me.HUD_Item.extend({
+    init: function(x, y) {
+        this.parent(x,y);
+        this.font = new me.Font("Helvetica", 24, "lightgrey", "left");
+    },
+
+    draw: function(context, x, y) {
+        this.font.draw(context, this.value, this.pos.x + x, this.pos.y + y);
+    }
+});
+
+/***
+MAIN PLAYER
+***/
 var PlayerEntity = me.ObjectEntity.extend({
 
     init: function(x, y, settings) {
         this.parent(x,y,settings);
 
         this.updateColRect(8,48,10,54);
-//defaults
         this.setVelocity(0,0);
         this.setFriction(0.22, 0.22);
         this.gravity = 0;
@@ -263,45 +280,34 @@ var PlayerEntity = me.ObjectEntity.extend({
         this.type = me.game.PLAYER_MAIN;
 
     },
-
-    /* -----
- 
-    update the player pos
- 
-    ------ */
+    checkRemoveMessage: function() {
+        if (me.game.MESSAGE_IS_SHOWING) {
+            me.game.HUD.updateItemValue("message", "");
+        }
+    },
     update: function() {
- 
- 
         this.handleInput();
-
         this.updateMovement();
 
-           // check for collision
         var res = me.game.collide(this);
 
         if (res) {
-            // if we collide with an enemy
             if (res.obj.type == me.game.ENEMY_OBJECT) {
                     this.flicker(45);
                     if (this.isFiring) {
                         me.game.HUD.updateItemValue("score", 25);
                     } else {
                         me.game.HUD.updateItemValue("health", -1);
-
                         this.health = this.health  - 1;
-
                         if (this.health === 0) {
                             me.game.PLAYER_IS_ALIVE = false;
                             me.state.change(me.game.LOSE);
                         }
-
                     }
             }
         }
  
-        // update animation if necessary
         if (this.vel.x!==0 || this.vel.y !== 0 || this.isFiring) {
-            // update objet animation
             this.parent(this);
             return true;
         }
@@ -311,6 +317,7 @@ var PlayerEntity = me.ObjectEntity.extend({
     handleInput: function() {
 
         if (me.input.isKeyPressed('fire')) {
+            this.checkRemoveMessage();
             this.isFiring = true;
             this.setVelocity(0,0);
             
@@ -324,12 +331,12 @@ var PlayerEntity = me.ObjectEntity.extend({
             me.game.sort();
         } else {
             this.isFiring = false;
-            this.setVelocity(3,3);
+            this.setVelocity(2,2);
         }
         var currentAnimation = "";
-        
+       /* only keyboard for now
         if (me.input.isKeyPressed("mouseOverride")) {
-            
+            this.checkRemoveMessage();
             if (this.collisionBox.left > me.input.mouse.pos.x) {
                 this.vel.x -= this.accel.x * me.timer.tick * 4;
                 this.direction = "west";
@@ -343,25 +350,29 @@ var PlayerEntity = me.ObjectEntity.extend({
                 this.vel.y = this.accel.y * me.timer.tick;
                 this.direction = 'south';
             }
-        }
+        } */
 
         if (me.input.isKeyPressed('left'))
         {
+            this.checkRemoveMessage();
             this.vel.x -= this.accel.x * me.timer.tick;
             this.direction = 'west';
         }
         else if (me.input.isKeyPressed('right'))
         {
+            this.checkRemoveMessage();
             this.vel.x += this.accel.x * me.timer.tick;
             this.direction = 'east';
         }
         if (me.input.isKeyPressed('up'))
         {
+            this.checkRemoveMessage();
             this.vel.y = -this.accel.y * me.timer.tick;
             this.direction = 'north';
         }
         else if (me.input.isKeyPressed('down'))
         {
+            this.checkRemoveMessage();
             this.vel.y = this.accel.y * me.timer.tick;
             this.direction = 'south';
         }
@@ -383,7 +394,6 @@ var PlayerEntity = me.ObjectEntity.extend({
 
 
         if ( currentAnimation !== "" ) {
-
             this.setCurrentAnimation(currentAnimation);
         }
     }
@@ -461,6 +471,8 @@ var EnemyEntity = me.ObjectEntity.extend({
     },
     onCollision: function(res, obj) {
         //we should do something here
+        me.game.MESSAGE_IS_SHOWING = true;
+        me.game.HUD.updateItemValue("message", "EHEU!");
     },
     update: function() {
         
