@@ -1,90 +1,23 @@
 // game resources
 var g_resources = [
-    {
-        name: "lava",
-        type: "image",
-        src: "assets/lava.png"
-    },
-    {
-        name: "lavarock",
-        type: "image",
-        src: "assets/lavarock.png"
-    },
-    {
-        name: "grass",
-        type: "image",
-        src: "assets/grass.png"
-    },
-    {
-        name: "fence",
-        type: "image",
-        src: "assets/fence.png"
-    },
-    {
-        name: "dirt2",
-        type: "image",
-        src: "assets/dirt2.png"
-    },
-    {
-        name: "test1",
-        type: "tmx",
-        src: "test1.tmx"
-    },
-    {
-        name: "gray_mage",
-        type: "image",
-        src: "assets/gray_mage.png"
-    },
-    {
-        name: "malesoldierzombie",
-        type: "image",
-        src: "assets/malesoldierzombie.png"
-    },
-    {
-        name: "house",
-        type: "image",
-        src: "assets/house.png"
-    },
-    {
-        name: "magic_firelion_sheet",
-        type: "image",
-        src: "assets/magic/magic_firelion_sheet.png"
-    },
-    {
-        name: "32x32_font",
-        type: "image",
-        src: "assets/32x32_font.png"
-    },
-    {
-        name: "metatiles32x32",
-        type: "image",
-        src: "assets/metatiles32x32.png"
-    },
-    {
-        name: "tileset01",
-        type: "image",
-        src: "assets/tileset01.png"
-    },
-    {
-        name: "water",
-        type: "image",
-        src: "assets/water.png"
-    },
-    {
-        name: "waterfall",
-        type: "image",
-        src: "assets/waterfall.png"
-    },
-    {
-        name: "watergrass",
-        type: "image",
-        src: "assets/watergrass.png"
-    },
-    {
-        name:"lpc_home_cup",
-        type: "image",
-        src: "assets/lpc_home_cup.png"
-    }
+    {       name: "lava",        type: "image",        src: "assets/lava.png"    },
+    {        name: "lavarock",        type: "image",        src: "assets/lavarock.png"    },
+    {        name: "grass",       type: "image",        src: "assets/grass.png"    },
+    {        name: "fence",        type: "image",        src: "assets/fence.png"    },
+    {        name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
+    {        name: "test1",        type: "tmx",        src: "test1.tmx"    },
+    {        name: "gray_mage",        type: "image",        src: "assets/gray_mage.png"    },
+    {        name: "forest_mage",   type: "image", src: "assets/forest_mage.png" },
+    {        name: "malesoldierzombie",        type: "image",        src: "assets/malesoldierzombie.png"    },
+    {        name: "house",        type: "image",        src: "assets/house.png"    },
+    {        name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
+    {        name: "32x32_font",        type: "image",        src: "assets/32x32_font.png"    },
+    {        name: "metatiles32x32",        type: "image",        src: "assets/metatiles32x32.png"    },
+    {        name: "tileset01",        type: "image",        src: "assets/tileset01.png"    },
+    {        name: "water",        type: "image",        src: "assets/water.png"    },
+    {        name: "waterfall",        type: "image",        src: "assets/waterfall.png"    },
+    {        name: "watergrass",        type: "image",        src: "assets/watergrass.png"    },
+    {        name:"lpc_home_cup",        type: "image",        src: "assets/lpc_home_cup.png"    }
     ];
  
 var jsApp = {
@@ -127,7 +60,8 @@ var jsApp = {
         me.game.BAD_GUY_COUNT = 7;
         me.game.GAME_IS_WON = false;
         me.game.MESSAGE_IS_SHOWING = false;
-
+        me.game.CURRENT_FRIENDLY_MESSAGE = 0;
+        me.game.FRIENDLY_MESSAGES = ["You can use your magic by pressing 'o'", "Don't forget to watch out for evil zombie soldiers", "To save the world you'll need to find the cup"];
         me.state.set(me.state.MENU, new MenuScreen());
         // set the "Play/Ingame" Screen Object
         me.state.set(me.state.PLAY, new PlayScreen());
@@ -138,6 +72,7 @@ var jsApp = {
 
 // add our player entity in the entity pool
         me.entityPool.add("mainPlayer", PlayerEntity);
+        me.entityPool.add("friendlyForestMage", FriendEntity);
         me.entityPool.add("EnemyEntity", EnemyEntity);
         me.entityPool.add("MagicEntity", MagicEntity);
 
@@ -166,11 +101,15 @@ var PlayScreen = me.ScreenObject.extend({
         if (!me.game.HUD) {
             me.game.addHUD(0,0,720,480);
             // add the "score" HUD item
-            me.game.HUD.addItem("score", new ScoreObject(500,30));
-            me.game.HUD.addItem("health", new ScoreObject(20, 30));
-            me.game.HUD.addItem("message", new MessageObject(340,400));
+            me.game.HUD.addItem("score", new ScoreObject(600,30));
+            me.game.HUD.addItem("scorelbl", new ScoreObject(500, 30));
+            me.game.HUD.addItem("health", new ScoreObject(100, 30));
+            me.game.HUD.addItem("healthlbl", new ScoreObject(1, 30));
+            me.game.HUD.addItem("message", new MessageObject(20,400));
         }
+        me.game.HUD.setItemValue("healthlbl", "health:");
         me.game.HUD.setItemValue("health", 100);
+        me.game.HUD.setItemValue("scorelbl", "score:");
         me.game.HUD.setItemValue("score", 0);
         me.game.HUD.setItemValue("message", "");
     },
@@ -190,14 +129,26 @@ var MenuScreen = me.ScreenObject.extend({
         this.parent(true);
         this.title = null;
         this.font = new me.Font("Helvetica", 48, "white", "center");
+        this.fontsmall = new me.Font("Helvetica", 24, "white", "center");
 
-
+        this.scroller =  "use 'w', 'a', 's', and 'd' keys to move";
+        this.scrollerpos = 700;
     },
     onResetEvent: function() {
         if (this.title === null) {
             this.title = me.loader.getImage("lpc_home_cup");
         }
+        this.scrollerpos = 720;
+        this.scrollertween = new me.Tween(this).to({
+            scrollerpos: -2200
+        }, 5e4).onComplete(this.scrollover.bind(this)).start();
         me.input.bindKey(me.input.KEY.ENTER,"enter",true);
+    },
+     scrollover: function() {
+        this.scrollerpos = 720;
+        this.scrollertween.to({
+            scrollerpos: -2200
+        }, 10000).onComplete(this.scrollover.bind(this)).start();
     },
     update: function() {
         if (me.input.isKeyPressed("enter")) {
@@ -214,9 +165,13 @@ var MenuScreen = me.ScreenObject.extend({
             this.font.draw(context, "YOU WON!!", 200, 300);
         }
         this.font.draw(context, "PRESS ENTER TO PLAY", 80, 400);
+
+        //this.fontsmall.draw(context, "use 'w', 'a', 's', and 'd' keys to move", 155, 450);
+        this.fontsmall.draw(context, this.scroller, this.scrollerpos, 450);
     },
     onDestroyEvent: function() {
         me.input.unbindKey(me.input.KEY.ENTER);
+        this.scrollertween.stop();
     }
 });
 
@@ -284,6 +239,7 @@ var PlayerEntity = me.ObjectEntity.extend({
         if (me.game.MESSAGE_IS_SHOWING) {
             me.game.HUD.updateItemValue("message", "");
         }
+            
     },
     update: function() {
         this.handleInput();
@@ -430,6 +386,41 @@ var MagicEntity = me.ObjectEntity.extend({
     }
 });
 
+var FriendEntity = me.ObjectEntity.extend({
+    init: function(x, y, settings) {
+        settings.image = "forest_mage";
+        settings.spritewidth = 64;
+        settings.spriteheight = 64;
+
+        this.parent(x, y, settings);
+
+        this.updateColRect(8,48,10,54);
+
+        this.gravity = 0;
+        this.setVelocity(0,0);
+        this.collidable = true;
+
+        this.addAnimation("stand-s", [18]);
+
+        this.type = me.game.FRIEND_OBJECT;
+    },
+    onCollision: function(res, obj) {
+        if (obj.type === me.game.PLAYER_MAIN) {
+            me.game.MESSAGE_IS_SHOWING = true;
+            me.game.HUD.updateItemValue("message", me.game.FRIENDLY_MESSAGES[me.game.CURRENT_FRIENDLY_MESSAGE] );
+       
+        }
+
+    },
+    update: function() {
+        this.setCurrentAnimation("stand-s");
+
+        return true;
+    }
+});
+me.state.onPause = function() {
+                console.log("paused");
+            };
 var EnemyEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
         settings.image = "malesoldierzombie";
