@@ -61,46 +61,37 @@ var jsApp = {
         me.game.GAME_IS_WON = false;
         me.game.MESSAGE_IS_SHOWING = false;
         me.game.CURRENT_FRIENDLY_MESSAGE = 0;
-        me.game.FRIENDLY_MESSAGES = ["You can use your magic by pressing 'o'", "Don't forget to watch out for evil zombie soldiers", "To save the world you'll need to find the cup"];
+        me.game.FRIENDLY_MESSAGES = ["You can defend yourself by pressing spacebar", "Don't forget to watch out for evil zombie soldiers", "To save the world you'll need to find the cup"];
         me.state.set(me.state.MENU, new MenuScreen());
-        // set the "Play/Ingame" Screen Object
         me.state.set(me.state.PLAY, new PlayScreen());
 
 
         me.state.set(me.state.LOSE, new MenuScreen());
         me.state.set(me.state.WIN, new MenuScreen());
 
-// add our player entity in the entity pool
         me.entityPool.add("mainPlayer", PlayerEntity);
         me.entityPool.add("friendlyForestMage", FriendEntity);
         me.entityPool.add("EnemyEntity", EnemyEntity);
         me.entityPool.add("MagicEntity", MagicEntity);
 
-        // enable the keyboard
-        me.input.bindKey(me.input.KEY.A, "left");
-        me.input.bindKey(me.input.KEY.D, "right");
-        me.input.bindKey(me.input.KEY.W, "up");
-        me.input.bindKey(me.input.KEY.S, "down");
-        me.input.bindKey(me.input.KEY.O, "fire");
+        me.input.bindKey(me.input.KEY.LEFT, "left");
+        me.input.bindKey(me.input.KEY.RIGHT, "right");
+        me.input.bindKey(me.input.KEY.UP, "up");
+        me.input.bindKey(me.input.KEY.DOWN, "down");
+        me.input.bindKey(me.input.KEY.SPACE, "fire");
         me.input.bindKey(me.input.KEY.X, "mouseOverride");
         me.input.bindMouse(me.input.mouse.LEFT, me.input.KEY.X);
 
-        // start the game
         me.state.change(me.state.MENU);
     }
  
 };
-// jsApp
-/* the in game stuff*/
 var PlayScreen = me.ScreenObject.extend({
  
     onResetEvent: function() {
-        // stuff to reset on state change
         me.levelDirector.loadLevel("test1");
-         // add a default HUD to the game mngr (with no background)
         if (!me.game.HUD) {
             me.game.addHUD(0,0,720,480);
-            // add the "score" HUD item
             me.game.HUD.addItem("score", new ScoreObject(600,30));
             me.game.HUD.addItem("scorelbl", new ScoreObject(500, 30));
             me.game.HUD.addItem("health", new ScoreObject(100, 30));
@@ -114,11 +105,6 @@ var PlayScreen = me.ScreenObject.extend({
         me.game.HUD.setItemValue("message", "");
     },
  
-    /* ---
- 
-     action to perform when game is finished (state change)
- 
-     --- */
     onDestroyEvent: function() {
     }
  
@@ -131,7 +117,7 @@ var MenuScreen = me.ScreenObject.extend({
         this.font = new me.Font("Helvetica", 48, "white", "center");
         this.fontsmall = new me.Font("Helvetica", 24, "white", "center");
 
-        this.scroller =  "use 'w', 'a', 's', and 'd' keys to move";
+        this.scroller =  "use the arrow keys to move";
         this.scrollerpos = 700;
     },
     onResetEvent: function() {
@@ -165,8 +151,6 @@ var MenuScreen = me.ScreenObject.extend({
             this.font.draw(context, "YOU WON!!", 200, 300);
         }
         this.font.draw(context, "PRESS ENTER TO PLAY", 80, 400);
-
-        //this.fontsmall.draw(context, "use 'w', 'a', 's', and 'd' keys to move", 155, 450);
         this.fontsmall.draw(context, this.scroller, this.scrollerpos, 450);
     },
     onDestroyEvent: function() {
@@ -177,10 +161,7 @@ var MenuScreen = me.ScreenObject.extend({
 
 var ScoreObject = me.HUD_Item.extend({
    init: function(x, y) {
-        // call the parent constructor
         this.parent(x, y);
-        // create a font
-        //this.font = new me.BitmapFont("32x32_font", 32);
         this.font = new me.Font("Helvetica", 32, "white", "left");
     },
  
@@ -235,11 +216,12 @@ var PlayerEntity = me.ObjectEntity.extend({
         this.type = me.game.PLAYER_MAIN;
 
     },
+    weaponState: null,
     checkRemoveMessage: function() {
         if (me.game.MESSAGE_IS_SHOWING) {
             me.game.HUD.updateItemValue("message", "");
         }
-            
+
     },
     update: function() {
         this.handleInput();
@@ -249,10 +231,10 @@ var PlayerEntity = me.ObjectEntity.extend({
 
         if (res) {
             if (res.obj.type == me.game.ENEMY_OBJECT) {
-                    this.flicker(45);
                     if (this.isFiring) {
-                        me.game.HUD.updateItemValue("score", 25);
-                    } else {
+                        me.game.HUD.updateItemValue("score", this.weaponState ? 25 : 8);
+                    } else if (!this.flickering) {
+
                         me.game.HUD.updateItemValue("health", -1);
                         this.health = this.health  - 1;
                         if (this.health === 0) {
@@ -260,6 +242,7 @@ var PlayerEntity = me.ObjectEntity.extend({
                             me.state.change(me.game.LOSE);
                         }
                     }
+                    this.flicker(30);
             }
         }
  
@@ -276,15 +259,16 @@ var PlayerEntity = me.ObjectEntity.extend({
             this.checkRemoveMessage();
             this.isFiring = true;
             this.setVelocity(0,0);
-            
-            if (this.direction === "west") {
-                magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, {});
-                magic.flipX(true);
-            } else if (this.direction === "east") {
-                magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, {});
+            if (this.weaponState) {
+                if (this.direction === "west") {
+                    magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, {});
+                    magic.flipX(true);
+                } else if (this.direction === "east") {
+                    magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, {});
+                }
+                me.game.add(magic, this.z);
+                me.game.sort();
             }
-            me.game.add(magic, this.z);
-            me.game.sort();
         } else {
             this.isFiring = false;
             this.setVelocity(2,2);
@@ -462,8 +446,21 @@ var EnemyEntity = me.ObjectEntity.extend({
     },
     onCollision: function(res, obj) {
         //we should do something here
-        me.game.MESSAGE_IS_SHOWING = true;
-        me.game.HUD.updateItemValue("message", "EHEU!");
+        //me.game.MESSAGE_IS_SHOWING = true;
+        //me.game.HUD.updateItemValue("message", "EHEU!");
+        if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
+            console.log("yo");
+              me.game.HUD.updateItemValue("score", 5);
+                this.health = this.health - 0.5;
+                if (this.health === 0) {
+                    me.game.remove(this);
+                    me.game.BAD_GUY_COUNT--;
+                    if (me.game.BAD_GUY_COUNT === 0) {
+                        me.game.GAME_IS_WON = true;
+                        me.state.change(me.game.WIN);
+                    }
+                }
+        }
     },
     update: function() {
         
@@ -484,7 +481,6 @@ var EnemyEntity = me.ObjectEntity.extend({
         var res = me.game.collide(this);
 
         if (res) {
-            // if we collide with an enemy
             if (res.obj.type == me.game.MAGIC_OBJECT) {
                 me.game.HUD.updateItemValue("score", 25);
                 this.health = this.health - 2;
