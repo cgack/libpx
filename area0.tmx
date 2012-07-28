@@ -84,6 +84,13 @@
     <property name="to" value="area_east"/>
    </properties>
   </object>
+  <object name="me.LevelEntity" x="1212" y="703" width="41" height="26">
+   <properties>
+    <property name="duration" value="250"/>
+    <property name="fade" value="#000000"/>
+    <property name="to" value="inside"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="EnemyEntities" width="90" height="60">
   <object name="EnemyEntity" x="2334" y="528" width="503" height="1124">

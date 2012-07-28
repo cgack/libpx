@@ -1,26 +1,34 @@
 // game resources
 var g_resources = [
-    {       name: "lava",        type: "image",        src: "assets/lava.png"    },
-    {        name: "lavarock",        type: "image",        src: "assets/lavarock.png"    },
-    {        name: "grass",       type: "image",        src: "assets/grass.png"    },
-    {        name: "fence",        type: "image",        src: "assets/fence.png"    },
-    {        name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
-    {        name: "area0",        type: "tmx",        src: "area0.tmx"    },
-    {        name: "area0_e",        type: "tmx",        src: "area0_e.tmx"    },
-    {        name: "area_east",     type: "tmx",        src: "area_east.tmx"},
-    {        name: "gray_mage",        type: "image",        src: "assets/gray_mage.png"    },
-    {        name: "forest_mage",   type: "image", src: "assets/forest_mage.png" },
-    {        name: "dark_mage_elder", type: "image", src: "assets/dark_mage_elder.png"},
-    {        name: "malesoldierzombie",        type: "image",        src: "assets/malesoldierzombie.png"    },
-    {        name: "house",        type: "image",        src: "assets/house.png"    },
-    {        name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
-    {        name: "32x32_font",        type: "image",        src: "assets/32x32_font.png"    },
-    {        name: "metatiles32x32",        type: "image",        src: "assets/metatiles32x32.png"    },
-    {        name: "tileset01",        type: "image",        src: "assets/tileset01.png"    },
-    {        name: "water",        type: "image",        src: "assets/water.png"    },
-    {        name: "waterfall",        type: "image",        src: "assets/waterfall.png"    },
-    {        name: "watergrass",        type: "image",        src: "assets/watergrass.png"    },
-    {        name:"lpc_home_cup",        type: "image",        src: "assets/lpc_home_cup.png"    }
+    {   name: "lava",        type: "image",        src: "assets/lava.png"    },
+    {   name: "lavarock",        type: "image",        src: "assets/lavarock.png"    },
+    {   name: "grass",       type: "image",        src: "assets/grass.png"    },
+    {   name: "fence",        type: "image",        src: "assets/fence.png"    },
+    {   name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
+    {   name: "area0",        type: "tmx",        src: "area0.tmx"    },
+    {   name: "area0_e",        type: "tmx",        src: "area0_e.tmx"    },
+    {   name: "area_east",     type: "tmx",        src: "area_east.tmx"},
+    {   name: "inside",     type: "tmx", src: "inside.tmx" },
+    {   name: "area0_farm", type: "tmx", src: "area0_farm.tmx"},
+    {   name: "gray_mage", type: "image",        src: "assets/gray_mage.png"    },
+    {   name: "forest_mage",   type: "image", src: "assets/forest_mage.png" },
+    {   name: "dark_mage_elder", type: "image", src: "assets/dark_mage_elder.png"},
+    {   name: "malesoldierzombie",        type: "image",        src: "assets/malesoldierzombie.png"    },
+    {   name: "house",        type: "image",        src: "assets/house.png"    },
+    {   name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
+    {   name: "32x32_font",        type: "image",        src: "assets/32x32_font.png"    },
+    {   name: "metatiles32x32",        type: "image",        src: "assets/metatiles32x32.png"    },
+    {   name: "tileset01",        type: "image",        src: "assets/tileset01.png"    },
+    {   name: "water",        type: "image",        src: "assets/water.png"    },
+    {   name: "waterfall",        type: "image",        src: "assets/waterfall.png"    },
+    {   name: "watergrass",        type: "image",        src: "assets/watergrass.png"    },
+    {   name:"lpc_home_cup",        type: "image",        src: "assets/lpc_home_cup.png"    },
+    {   name: "inside", type:"image", src: "assets/inside.png"},
+    {   name: "royal_mage", type: "image", src: "assets/royal_mage.png"},
+    {   name: "barrel", type: "image", src: "assets/barrel.png"},
+    {   name: "cabinets", type: "image", src:"assets/cabinets.png" },
+    {   name: "country", type: "image", src: "assets/country.png" }
+
     ];
  
 var jsApp = {
@@ -75,6 +83,7 @@ var jsApp = {
         me.entityPool.add("mainPlayer", PlayerEntity);
         me.entityPool.add("friendlyForestMage", FriendEntity);
         me.entityPool.add("friendFireMage", FireMage);
+        me.entityPool.add("friendRoyalMage", RoyalMage);
         me.entityPool.add("EnemyEntity", EnemyEntity);
         me.entityPool.add("MagicEntity", MagicEntity);
 
@@ -377,7 +386,6 @@ var MagicEntity = me.ObjectEntity.extend({
 
 var FireMage = me.ObjectEntity.extend({
    init: function(x, y, settings) {
-        //settings.image = "forest_mage";
         settings.spritewidth = 64;
         settings.spriteheight = 64;
 
@@ -407,6 +415,39 @@ var FireMage = me.ObjectEntity.extend({
         return true;
     }
 });
+
+var RoyalMage = me.ObjectEntity.extend({
+   init: function(x, y, settings) {
+        settings.spritewidth = 64;
+        settings.spriteheight = 64;
+
+        this.parent(x, y, settings);
+
+        this.updateColRect(8,48,10,54);
+
+        this.gravity = 0;
+        this.setVelocity(0,0);
+        this.collidable = true;
+
+        this.addAnimation("stand-s", [18]);
+
+        this.type = me.game.FRIEND_OBJECT;
+    },
+    onCollision: function(res, obj) {
+        if (obj.type === me.game.PLAYER_MAIN) {
+            me.game.MESSAGE_IS_SHOWING = true;
+            me.game.HUD.updateItemValue("message", "To save the world you'll need to find the cup." );
+            me.game.STATES["cupKnowledge"] = "true";
+        }
+
+    },
+    update: function() {
+        this.setCurrentAnimation("stand-s");
+
+        return true;
+    }
+});
+
 
 var FriendEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {

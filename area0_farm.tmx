@@ -63,7 +63,7 @@
   </data>
  </layer>
  <objectgroup name="Entities" width="90" height="60">
-  <object name="mainPlayer" x="2761" y="473" width="82" height="44">
+  <object name="mainPlayer" x="1196" y="747" width="82" height="44">
    <properties>
     <property name="image" value="gray_mage"/>
     <property name="spriteheight" value="64"/>
@@ -77,14 +77,14 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="2855" y="-9" width="28" height="1777">
+  <object name="me.LevelEntity" x="2785" y="442" width="94" height="550">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_east"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="1207" y="700" width="46" height="35">
+  <object name="me.LevelEntity" x="1214" y="700" width="37" height="24">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
