@@ -63,7 +63,7 @@
   </data>
  </layer>
  <objectgroup name="Entities" width="90" height="60">
-  <object name="mainPlayer" x="1196" y="747" width="82" height="44">
+  <object name="mainPlayer" x="128" y="1194" width="82" height="44">
    <properties>
     <property name="image" value="gray_mage"/>
     <property name="spriteheight" value="64"/>
@@ -77,35 +77,35 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="2785" y="442" width="94" height="550">
+  <object name="me.LevelEntity" x="2852" y="6" width="81" height="1739">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_east"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="1214" y="700" width="37" height="24">
+  <object name="me.LevelEntity" x="1212" y="703" width="41" height="26">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="inside"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="0" y="1031" width="51" height="889">
+  <object name="me.LevelEntity" x="10" y="1064" width="32" height="837">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_west"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="597" y="7" width="2125" height="11">
+  <object name="me.LevelEntity" x="569" y="6" width="2200" height="14">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_north"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="6" y="1906" width="2125" height="11">
+  <object name="me.LevelEntity" x="0" y="1904" width="821" height="49">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
@@ -121,7 +121,7 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="11" y="1111" width="506" height="777">
+  <object name="EnemyEntity" x="88" y="1066" width="506" height="777">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>

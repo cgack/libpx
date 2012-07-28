@@ -63,7 +63,7 @@
   </data>
  </layer>
  <objectgroup name="Entities" width="90" height="60">
-  <object name="mainPlayer" x="1196" y="747" width="82" height="44">
+  <object name="mainPlayer" x="1493" y="112" width="82" height="44">
    <properties>
     <property name="image" value="gray_mage"/>
     <property name="spriteheight" value="64"/>
@@ -77,58 +77,58 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="2785" y="442" width="94" height="550">
+  <object name="me.LevelEntity" x="2794" y="13" width="81" height="1751">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_east"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="1214" y="700" width="37" height="24">
+  <object name="me.LevelEntity" x="1212" y="703" width="41" height="26">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="inside"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="0" y="1031" width="51" height="889">
+  <object name="me.LevelEntity" x="6" y="1074" width="40" height="815">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_west"/>
    </properties>
   </object>
-  <object name="me.LevelEntity" x="597" y="7" width="2125" height="11">
-   <properties>
-    <property name="duration" value="250"/>
-    <property name="fade" value="#000000"/>
-    <property name="to" value="area_north"/>
-   </properties>
-  </object>
-  <object name="me.LevelEntity" x="6" y="1906" width="2125" height="11">
+  <object name="me.LevelEntity" x="44" y="1869" width="445" height="44">
    <properties>
     <property name="duration" value="250"/>
     <property name="fade" value="#000000"/>
     <property name="to" value="area_south"/>
    </properties>
   </object>
+  <object name="me.LevelEntity" x="530" y="-3" width="2183" height="44">
+   <properties>
+    <property name="duration" value="250"/>
+    <property name="fade" value="#000000"/>
+    <property name="to" value="area_north"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="EnemyEntities" width="90" height="60">
-  <object name="EnemyEntity" x="2334" y="528" width="503" height="1124">
+  <object name="EnemyEntity" x="2252" y="517" width="503" height="1124">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="11" y="1111" width="506" height="777">
+  <object name="EnemyEntity" x="104" y="1092" width="506" height="777">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="2262" y="36" width="558" height="366">
+  <object name="EnemyEntity" x="2200" y="75" width="558" height="366">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
@@ -149,7 +149,7 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="1185" y="48" width="277" height="326">
+  <object name="EnemyEntity" x="1044" y="80" width="277" height="326">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>

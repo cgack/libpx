@@ -1,21 +1,27 @@
 // game resources
 var g_resources = [
-    {   name: "lava",        type: "image",        src: "assets/lava.png"    },
-    {   name: "lavarock",        type: "image",        src: "assets/lavarock.png"    },
-    {   name: "grass",       type: "image",        src: "assets/grass.png"    },
-    {   name: "fence",        type: "image",        src: "assets/fence.png"    },
-    {   name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
+    /* maps */
     {   name: "area0",        type: "tmx",        src: "area0.tmx"    },
     {   name: "area0_e",        type: "tmx",        src: "area0_e.tmx"    },
     {   name: "area_east",     type: "tmx",        src: "area_east.tmx"},
+    {   name: "area_west", type: "tmx", src: "area_west.tmx" },
+    {   name: "area0_w", type: "tmx", src: "area0_w.tmx"},
+    {   name: "area_south", type:"tmx", src: "area_south.tmx" },
+    {   name: "area0_s", type: "tmx", src: "area0_s.tmx" },
+    {   name: "area_north", type: "tmx", src: "area_north.tmx" },
+    {   name: "area0_n", type: "tmx", src: "area0_n.tmx" },
     {   name: "inside",     type: "tmx", src: "inside.tmx" },
     {   name: "area0_farm", type: "tmx", src: "area0_farm.tmx"},
+    /* characters */
     {   name: "gray_mage", type: "image",        src: "assets/gray_mage.png"    },
     {   name: "forest_mage",   type: "image", src: "assets/forest_mage.png" },
     {   name: "dark_mage_elder", type: "image", src: "assets/dark_mage_elder.png"},
+    {   name: "royal_mage", type: "image", src: "assets/royal_mage.png"},
     {   name: "malesoldierzombie",        type: "image",        src: "assets/malesoldierzombie.png"    },
+    /* other assets */
     {   name: "house",        type: "image",        src: "assets/house.png"    },
     {   name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
+    {   name: "magic_torrentacle", type: "image", src: "assets/magic/magic_torrentacle.png" },
     {   name: "32x32_font",        type: "image",        src: "assets/32x32_font.png"    },
     {   name: "metatiles32x32",        type: "image",        src: "assets/metatiles32x32.png"    },
     {   name: "tileset01",        type: "image",        src: "assets/tileset01.png"    },
@@ -24,10 +30,20 @@ var g_resources = [
     {   name: "watergrass",        type: "image",        src: "assets/watergrass.png"    },
     {   name:"lpc_home_cup",        type: "image",        src: "assets/lpc_home_cup.png"    },
     {   name: "inside", type:"image", src: "assets/inside.png"},
-    {   name: "royal_mage", type: "image", src: "assets/royal_mage.png"},
     {   name: "barrel", type: "image", src: "assets/barrel.png"},
     {   name: "cabinets", type: "image", src:"assets/cabinets.png" },
-    {   name: "country", type: "image", src: "assets/country.png" }
+    {   name: "country", type: "image", src: "assets/country.png" },
+    {   name: "cup", type: "image", src: "assets/cup.png"},
+    {   name: "treetop", type: "image", src: "assets/treetop.png" },
+    {   name: "trunk", type: "image", src: "assets/trunk.png" },
+    {   name: "lava",        type: "image",        src: "assets/lava.png"    },
+    {   name: "lavarock",        type: "image",        src: "assets/lavarock.png"    },
+    {   name: "grass",       type: "image",        src: "assets/grass.png"    },
+    {   name: "fence",        type: "image",        src: "assets/fence.png"    },
+    {   name: "dirt",   type: "image", src: "assets/dirt.png" },
+    {   name: "hole", type: "image", src: "assets/hole.png" },
+    {   name: "dirt2",        type: "image",        src: "assets/dirt2.png"    }
+    
 
     ];
  
@@ -67,12 +83,17 @@ var jsApp = {
      --- */
     loaded: function() {
         me.game.PLAYER_IS_ALIVE = true;
-        me.game.BAD_GUY_COUNT = 7;
+        me.game.BAD_GUY_COUNT = 70;
         me.game.GAME_IS_WON = false;
         me.game.MESSAGE_IS_SHOWING = false;
-        me.game.CURRENT_FRIENDLY_MESSAGE = 0;
-        me.game.STATES = {};
-        me.game.FRIENDLY_MESSAGES = ["You can defend yourself by pressing spacebar", "Don't forget to watch out for evil zombie soldiers", "To save the world you'll need to find the cup"];
+        me.game.STATE = { 
+            playerIsAlive: true,
+            badGuyCount: 70,
+            gameIsWon: false,
+            messageIsShowing: false,
+            weaponState: null,
+            cupKnowledge: false
+        };
         me.state.set(me.state.MENU, new MenuScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
 
@@ -202,7 +223,7 @@ var PlayerEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
         this.parent(x,y,settings);
 
-        this.updateColRect(8,48,10,54);
+        this.updateColRect(16,32,10,54);
         this.setVelocity(0,0);
         this.setFriction(0.22, 0.22);
         this.gravity = 0;
@@ -230,7 +251,7 @@ var PlayerEntity = me.ObjectEntity.extend({
 
     },
     checkRemoveMessage: function() {
-        if (me.game.MESSAGE_IS_SHOWING) {
+        if (me.game.STATE.messageIsShowing) {
             me.game.HUD.updateItemValue("message", "");
         }
 
@@ -245,12 +266,13 @@ var PlayerEntity = me.ObjectEntity.extend({
             if (res.obj.type == me.game.ENEMY_OBJECT) {
                     if (this.isFiring) {
                         me.game.HUD.updateItemValue("score", this.weaponState ? 25 : 8);
-                    } else if (!this.flickering) {
+                    }
+                    if (!this.flickering) {
 
-                        me.game.HUD.updateItemValue("health", -1);
-                        this.health = this.health  - 1;
-                        if (this.health === 0) {
-                            me.game.PLAYER_IS_ALIVE = false;
+                        me.game.HUD.updateItemValue("health", - 3);
+                        this.health = this.health  - 3;
+                        if (this.health <= 0) {
+                            me.game.STATE.playerIsAlive = false;
                             me.state.change(me.game.LOSE);
                         }
                     }
@@ -271,40 +293,45 @@ var PlayerEntity = me.ObjectEntity.extend({
             this.checkRemoveMessage();
             this.isFiring = true;
             this.setVelocity(0,0);
-            if (me.game.STATES.weaponState === "firelion") {
+            if (me.game.STATE.weaponState === "firelion") {
                 if (this.direction === "west") {
-                    magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, { image: "magic_firelion_sheet"});
+                    magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, { image: "magic_firelion_sheet", spritewidth: 64, spriteheight: 64 });
                     magic.flipX(true);
                     me.game.add(magic, this.z);
                     me.game.sort();
                 } else if (this.direction === "east") {
-                    magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, { image: "magic_firelion_sheet"});
+                    magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, { image: "magic_firelion_sheet", spriteheight: 64, spritewidth: 64});
                     me.game.add(magic, this.z);
                     me.game.sort();
                 }
             }
+
+            if (me.game.STATE.weaponState === "magic_torrentacle") {
+                if (this.direction === "west") {
+                    magic = new MagicEntity(this.pos.x - 100, this.pos.y + 30 , { image: "magic_torrentacle", spriteheight: 128, spritewidth: 128});
+                    magic.flipX(true);
+                    me.game.add(magic, this.z);
+                    me.game.sort();
+                } else if (this.direction === "east") {
+                    magic = new MagicEntity(this.pos.x + 42, this.pos.y + 30, { image: "magic_torrentacle", spriteheight: 128, spritewidth: 128 });
+                    me.game.add(magic, this.z);
+                    me.game.sort();
+                } else if (this.direction === "south") {
+                    magic = new MagicEntity(this.pos.x - 24 , this.pos.y + 100, { image: "magic_torrentacle", spriteheight: 128, spritewidth: 128 });
+                    me.game.add(magic, this.z);
+                    me.game.sort();
+                } else if (this.direction === "north" ) {
+                    magic = new MagicEntity(this.pos.x - 24, this.pos.y - 30, { image: "magic_torrentacle", spriteheight: 128, spritewidth: 128 });
+                    me.game.add(magic, this.z);
+                    me.game.sort();
+                }
+            }
+
         } else {
             this.isFiring = false;
             this.setVelocity(2,2);
         }
         var currentAnimation = "";
-       /* only keyboard for now
-        if (me.input.isKeyPressed("mouseOverride")) {
-            this.checkRemoveMessage();
-            if (this.collisionBox.left > me.input.mouse.pos.x) {
-                this.vel.x -= this.accel.x * me.timer.tick * 4;
-                this.direction = "west";
-            } else if (this.collisionBox.right < me.input.mouse.pos.x) {
-                 this.vel.x += this.accel.x * me.timer.tick;
-                this.direction = 'east';
-            } else if (this.collisionBox.top > me.input.mouse.pos.y) {
-                this.vel.y = -this.accel.y * me.timer.tick;
-                this.direction = 'north';
-            } else if (this.collisionBox.bottom < me.input.mouse.pos.y) {
-                this.vel.y = this.accel.y * me.timer.tick;
-                this.direction = 'south';
-            }
-        } */
 
         if (me.input.isKeyPressed('left'))
         {
@@ -358,15 +385,10 @@ var PlayerEntity = me.ObjectEntity.extend({
 
 var MagicEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
-        //settings.image = "magic_firelion_sheet";
-        settings.spritewidth = 64;
-        settings.spriteheight = 64;
-
+        
         this.parent(x,y,settings);
 
         this.gravity = 0;
-        //this.setVelocity(3,0);
-        //this.vel.x = 0.1;
         this.collidable = true;
 
         this.addAnimation("fire", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);
@@ -403,9 +425,9 @@ var FireMage = me.ObjectEntity.extend({
     },
     onCollision: function(res, obj) {
         if (obj.type === me.game.PLAYER_MAIN) {
-            me.game.MESSAGE_IS_SHOWING = true;
+            me.game.STATE.messageIsShowing = true;
             me.game.HUD.updateItemValue("message", "For your troubles, I have given you the ability to cast fire." );
-            me.game.STATES["weaponState"] = "firelion";
+            me.game.STATE["weaponState"] = "firelion";
         }
 
     },
@@ -435,9 +457,9 @@ var RoyalMage = me.ObjectEntity.extend({
     },
     onCollision: function(res, obj) {
         if (obj.type === me.game.PLAYER_MAIN) {
-            me.game.MESSAGE_IS_SHOWING = true;
+            me.game.STATE.messageIsShowing = true;
             me.game.HUD.updateItemValue("message", "To save the world you'll need to find the cup." );
-            me.game.STATES["cupKnowledge"] = "true";
+            me.game.STATE["cupKnowledge"] = "true";
         }
 
     },
@@ -469,9 +491,9 @@ var FriendEntity = me.ObjectEntity.extend({
     },
     onCollision: function(res, obj) {
         if (obj.type === me.game.PLAYER_MAIN) {
-            me.game.MESSAGE_IS_SHOWING = true;
-            me.game.HUD.updateItemValue("message", me.game.FRIENDLY_MESSAGES[me.game.CURRENT_FRIENDLY_MESSAGE] );
-       
+            me.game.STATE.messageIsShowing = true;
+            me.game.HUD.updateItemValue("message","Defend yourself with spacebar, watch out for evil zombie soldiers" );
+            me.game.STATE["weaponState"] = "magic_torrentacle";
         }
 
     },
@@ -481,9 +503,6 @@ var FriendEntity = me.ObjectEntity.extend({
         return true;
     }
 });
-me.state.onPause = function() {
-                console.log("paused");
-            };
 var EnemyEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
         settings.image = "malesoldierzombie";
@@ -492,7 +511,7 @@ var EnemyEntity = me.ObjectEntity.extend({
 
         this.parent(x, y, settings);
         
-        this.updateColRect(8,48,10,54);
+        this.updateColRect(16,32,10,54);
 
         this.gravity = 0;
         this.setVelocity(0.5,1);
@@ -525,17 +544,15 @@ var EnemyEntity = me.ObjectEntity.extend({
     },
     onCollision: function(res, obj) {
         //we should do something here
-        //me.game.MESSAGE_IS_SHOWING = true;
-        //me.game.HUD.updateItemValue("message", "EHEU!");
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
             me.game.HUD.updateItemValue("score", 5);
-            var damage = me.game.STATES.weaponState === "firelion" ? 2 : 0.5;
+            var damage = me.game.STATE.weaponState === "firelion" ? 2 : 0.5;
             this.health = this.health - damage;
             if (this.health === 0) {
                 me.game.remove(this);
-                me.game.BAD_GUY_COUNT--;
-                if (me.game.BAD_GUY_COUNT === 0) {
-                    me.game.GAME_IS_WON = true;
+                me.game.STATE.badGuyCount--;
+                if (me.game.STATE.badGuyCount === 0) {
+                    me.game.STATE.gameIsWon = true;
                     me.state.change(me.game.WIN);
                 }
             }
@@ -565,9 +582,9 @@ var EnemyEntity = me.ObjectEntity.extend({
                 this.health = this.health - 2;
                 if (this.health === 0) {
                     me.game.remove(this);
-                    me.game.BAD_GUY_COUNT--;
-                    if (me.game.BAD_GUY_COUNT === 0) {
-                        me.game.GAME_IS_WON = true;
+                    me.game.STATE.badGuyCount--;
+                    if (me.game.STATE.badGuyCount === 0) {
+                        me.game.STATE.gameIsWon = true;
                         me.state.change(me.game.WIN);
                     }
                 }
@@ -582,7 +599,6 @@ var EnemyEntity = me.ObjectEntity.extend({
     }
 });
 
-//bootstrap :)
 window.onReady(function() {
     jsApp.onload();
 });
