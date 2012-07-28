@@ -5,9 +5,12 @@ var g_resources = [
     {        name: "grass",       type: "image",        src: "assets/grass.png"    },
     {        name: "fence",        type: "image",        src: "assets/fence.png"    },
     {        name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
-    {        name: "test1",        type: "tmx",        src: "test1.tmx"    },
+    {        name: "area0",        type: "tmx",        src: "area0.tmx"    },
+    {        name: "area0_e",        type: "tmx",        src: "area0_e.tmx"    },
+    {        name: "area_east",     type: "tmx",        src: "area_east.tmx"},
     {        name: "gray_mage",        type: "image",        src: "assets/gray_mage.png"    },
     {        name: "forest_mage",   type: "image", src: "assets/forest_mage.png" },
+    {        name: "dark_mage_elder", type: "image", src: "assets/dark_mage_elder.png"},
     {        name: "malesoldierzombie",        type: "image",        src: "assets/malesoldierzombie.png"    },
     {        name: "house",        type: "image",        src: "assets/house.png"    },
     {        name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
@@ -55,7 +58,6 @@ var jsApp = {
  
      --- */
     loaded: function() {
-        //MENU Screen
         me.game.PLAYER_IS_ALIVE = true;
         me.game.BAD_GUY_COUNT = 7;
         me.game.GAME_IS_WON = false;
@@ -71,6 +73,7 @@ var jsApp = {
 
         me.entityPool.add("mainPlayer", PlayerEntity);
         me.entityPool.add("friendlyForestMage", FriendEntity);
+        me.entityPool.add("friendFireMage", FireMage);
         me.entityPool.add("EnemyEntity", EnemyEntity);
         me.entityPool.add("MagicEntity", MagicEntity);
 
@@ -89,7 +92,7 @@ var jsApp = {
 var PlayScreen = me.ScreenObject.extend({
  
     onResetEvent: function() {
-        me.levelDirector.loadLevel("test1");
+        me.levelDirector.loadLevel("area0");
         if (!me.game.HUD) {
             me.game.addHUD(0,0,720,480);
             me.game.HUD.addItem("score", new ScoreObject(600,30));
@@ -259,15 +262,17 @@ var PlayerEntity = me.ObjectEntity.extend({
             this.checkRemoveMessage();
             this.isFiring = true;
             this.setVelocity(0,0);
-            if (this.weaponState) {
+            if (this.weaponState === "firelion") {
                 if (this.direction === "west") {
-                    magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, {});
+                    magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, { image: "magic_firelion_sheet"});
                     magic.flipX(true);
+                    me.game.add(magic, this.z);
+                    me.game.sort();
                 } else if (this.direction === "east") {
-                    magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, {});
+                    magic = new MagicEntity(this.pos.x + 42, this.pos.y + 42, { image: "magic_firelion_sheet"});
+                    me.game.add(magic, this.z);
+                    me.game.sort();
                 }
-                me.game.add(magic, this.z);
-                me.game.sort();
             }
         } else {
             this.isFiring = false;
@@ -344,7 +349,7 @@ var PlayerEntity = me.ObjectEntity.extend({
 
 var MagicEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
-        settings.image = "magic_firelion_sheet";
+        //settings.image = "magic_firelion_sheet";
         settings.spritewidth = 64;
         settings.spriteheight = 64;
 
@@ -370,9 +375,42 @@ var MagicEntity = me.ObjectEntity.extend({
     }
 });
 
+var FireMage = me.ObjectEntity.extend({
+   init: function(x, y, settings) {
+        //settings.image = "forest_mage";
+        settings.spritewidth = 64;
+        settings.spriteheight = 64;
+
+        this.parent(x, y, settings);
+
+        this.updateColRect(8,48,10,54);
+
+        this.gravity = 0;
+        this.setVelocity(0,0);
+        this.collidable = true;
+
+        this.addAnimation("stand-s", [18]);
+
+        this.type = me.game.FRIEND_OBJECT;
+    },
+    onCollision: function(res, obj) {
+        if (obj.type === me.game.PLAYER_MAIN) {
+            me.game.MESSAGE_IS_SHOWING = true;
+            me.game.HUD.updateItemValue("message", "For your troubles, I have given you the ability to cast fire." );
+            me.game.getEntityByName("mainPlayer")[0].weaponState = "firelion";
+        }
+
+    },
+    update: function() {
+        this.setCurrentAnimation("stand-s");
+
+        return true;
+    }
+});
+
 var FriendEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
-        settings.image = "forest_mage";
+        //settings.image = "forest_mage";
         settings.spritewidth = 64;
         settings.spriteheight = 64;
 
@@ -449,17 +487,17 @@ var EnemyEntity = me.ObjectEntity.extend({
         //me.game.MESSAGE_IS_SHOWING = true;
         //me.game.HUD.updateItemValue("message", "EHEU!");
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
-            console.log("yo");
-              me.game.HUD.updateItemValue("score", 5);
-                this.health = this.health - 0.5;
-                if (this.health === 0) {
-                    me.game.remove(this);
-                    me.game.BAD_GUY_COUNT--;
-                    if (me.game.BAD_GUY_COUNT === 0) {
-                        me.game.GAME_IS_WON = true;
-                        me.state.change(me.game.WIN);
-                    }
+            me.game.HUD.updateItemValue("score", 5);
+            var damage = me.game.getEntityByName("mainPlayer")[0].weaponState === "firelion" ? 2 : 0.5;
+            this.health = this.health - damage;
+            if (this.health === 0) {
+                me.game.remove(this);
+                me.game.BAD_GUY_COUNT--;
+                if (me.game.BAD_GUY_COUNT === 0) {
+                    me.game.GAME_IS_WON = true;
+                    me.state.change(me.game.WIN);
                 }
+            }
         }
     },
     update: function() {
