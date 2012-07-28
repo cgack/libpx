@@ -49,7 +49,7 @@ var jsApp = {
         me.loader.preload(g_resources);
  
         // load everything & display a loading screen
-        me.state.change(me.state.LOADING);
+       // me.state.change(me.state.LOADING);
     },
  
     /* ---
@@ -63,6 +63,7 @@ var jsApp = {
         me.game.GAME_IS_WON = false;
         me.game.MESSAGE_IS_SHOWING = false;
         me.game.CURRENT_FRIENDLY_MESSAGE = 0;
+        me.game.STATES = {};
         me.game.FRIENDLY_MESSAGES = ["You can defend yourself by pressing spacebar", "Don't forget to watch out for evil zombie soldiers", "To save the world you'll need to find the cup"];
         me.state.set(me.state.MENU, new MenuScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
@@ -219,7 +220,6 @@ var PlayerEntity = me.ObjectEntity.extend({
         this.type = me.game.PLAYER_MAIN;
 
     },
-    weaponState: null,
     checkRemoveMessage: function() {
         if (me.game.MESSAGE_IS_SHOWING) {
             me.game.HUD.updateItemValue("message", "");
@@ -262,7 +262,7 @@ var PlayerEntity = me.ObjectEntity.extend({
             this.checkRemoveMessage();
             this.isFiring = true;
             this.setVelocity(0,0);
-            if (this.weaponState === "firelion") {
+            if (me.game.STATES.weaponState === "firelion") {
                 if (this.direction === "west") {
                     magic = new MagicEntity(this.pos.x - 42, this.pos.y + 42, { image: "magic_firelion_sheet"});
                     magic.flipX(true);
@@ -397,7 +397,7 @@ var FireMage = me.ObjectEntity.extend({
         if (obj.type === me.game.PLAYER_MAIN) {
             me.game.MESSAGE_IS_SHOWING = true;
             me.game.HUD.updateItemValue("message", "For your troubles, I have given you the ability to cast fire." );
-            me.game.getEntityByName("mainPlayer")[0].weaponState = "firelion";
+            me.game.STATES["weaponState"] = "firelion";
         }
 
     },
@@ -488,7 +488,7 @@ var EnemyEntity = me.ObjectEntity.extend({
         //me.game.HUD.updateItemValue("message", "EHEU!");
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
             me.game.HUD.updateItemValue("score", 5);
-            var damage = me.game.getEntityByName("mainPlayer")[0].weaponState === "firelion" ? 2 : 0.5;
+            var damage = me.game.STATES.weaponState === "firelion" ? 2 : 0.5;
             this.health = this.health - damage;
             if (this.health === 0) {
                 me.game.remove(this);
