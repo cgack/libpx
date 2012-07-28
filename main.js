@@ -82,11 +82,7 @@ var jsApp = {
  
      --- */
     loaded: function() {
-        me.game.PLAYER_IS_ALIVE = true;
-        me.game.BAD_GUY_COUNT = 70;
-        me.game.GAME_IS_WON = false;
-        me.game.MESSAGE_IS_SHOWING = false;
-        me.game.STATE = { 
+        me.game.STATE = {
             playerIsAlive: true,
             badGuyCount: 70,
             gameIsWon: false,
@@ -105,6 +101,7 @@ var jsApp = {
         me.entityPool.add("friendlyForestMage", FriendEntity);
         me.entityPool.add("friendFireMage", FireMage);
         me.entityPool.add("friendRoyalMage", RoyalMage);
+        me.entityPool.add("lpc", lpc);
         me.entityPool.add("EnemyEntity", EnemyEntity);
         me.entityPool.add("MagicEntity", MagicEntity);
 
@@ -179,9 +176,9 @@ var MenuScreen = me.ScreenObject.extend({
     },
     draw: function(context) {
         context.drawImage(this.title, 0, 0);
-        if (!me.game.PLAYER_IS_ALIVE) {
-            this.font.draw(context, "You Lost!", 200, 300);
-        } else if (me.game.GAME_IS_WON) {
+        if (!me.game.STATE.playerIsAlive) {
+            this.font.draw(context, "You Just Lost The Game!", 100, 300);
+        } else if (me.game.STATE.gameIsWon) {
             this.font.draw(context, "YOU WON!!", 200, 300);
         }
         this.font.draw(context, "PRESS ENTER TO PLAY", 80, 400);
@@ -269,14 +266,14 @@ var PlayerEntity = me.ObjectEntity.extend({
                     }
                     if (!this.flickering) {
 
-                        me.game.HUD.updateItemValue("health", - 3);
-                        this.health = this.health  - 3;
-                        if (this.health <= 0) {
+                        me.game.HUD.updateItemValue("health", - 10);
+                        this.health = this.health  - 10;
+                        if (this.health === 0) {
                             me.game.STATE.playerIsAlive = false;
                             me.state.change(me.game.LOSE);
                         }
                     }
-                    this.flicker(30);
+                    this.flicker(15);
             }
         }
  
@@ -403,6 +400,32 @@ var MagicEntity = me.ObjectEntity.extend({
         this.updateMovement();
             this.parent(this);
             return true;
+    }
+});
+
+var lpc = me.ObjectEntity.extend({
+    init: function(x, y, settings) {
+        settings.spritewidth = 32;
+        settings.spriteheight = 64;
+        this.parent(x, y, settings);
+        this.gravity = 0;
+        this.setVelocity(0,0);
+        this.collidable = true;
+
+        this.type = me.game.LPC;
+    },
+    onCollision: function(res, obj) {
+        if (obj.type === me.game.PLAYER_MAIN) {
+            if (me.game.STATE.cupKnowledge) {
+                me.game.STATE.messageIsShowing = true;
+                me.game.HUD.updateItemValue("message", "You have found the Liberated Pixel Cup!");
+                me.game.STATE.gameIsWon = true;
+                me.state.change(me.game.WIN);
+            } else {
+                me.game.STATE.messageIsShowing = true;
+                me.game.HUD.updateItemValue("message", "What a strange place for a cup?");
+            }
+        }
     }
 });
 
