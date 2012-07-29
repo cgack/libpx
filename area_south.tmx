@@ -54,7 +54,7 @@
   </object>
  </objectgroup>
  <objectgroup name="EnemyEntities" width="60" height="30">
-  <object name="EnemyEntity" x="14" y="207" width="250" height="254">
+  <object name="EnemyEntity" x="51" y="221" width="250" height="254">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
@@ -68,7 +68,7 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="202" y="274" width="250" height="254">
+  <object name="EnemyEntity" x="173" y="313" width="250" height="254">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
@@ -82,21 +82,21 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="725" y="681" width="250" height="254">
+  <object name="EnemyEntity" x="703" y="653" width="250" height="254">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="478" y="357" width="250" height="254">
+  <object name="EnemyEntity" x="398" y="349" width="250" height="254">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="12" y="456" width="796" height="500">
+  <object name="EnemyEntity" x="45" y="468" width="769" height="437">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>

@@ -45,7 +45,12 @@ var g_resources = [
     {   name: "fence",        type: "image",        src: "assets/fence.png"    },
     {   name: "dirt",   type: "image", src: "assets/dirt.png" },
     {   name: "hole", type: "image", src: "assets/hole.png" },
-    {   name: "dirt2",        type: "image",        src: "assets/dirt2.png"    }
+    {   name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
+    /* sfx */
+    {   name: "Calmtown", type: "audio", src:"sfx/", channel: 1 },
+    {   name: "chomp", type: "audio", src:"sfx/", channel: 2},
+    {   name: "closing-umbrella", type: "audio", src: "sfx/", channel: 2 },
+    {   name: "metal-bowl", type: "audio", src: "sfx/", channel: 2 }
     
 
     ];
@@ -63,11 +68,12 @@ var jsApp = {
             alert("Sorry but your browser does not support html 5 canvas.");
             return;
         }
-        me.sys.useNativeAnimFrame = true;
+        //TODO: fix useNativeAnimFrame to not increase velocities on reload of levels
+        //me.sys.useNativeAnimFrame = true;
         me.sys.fps = 60;
         //me.debug.renderHitBox = true;
         // initialize the "audio"
-        me.audio.init("mp3,ogg");
+        me.audio.init("ogg");
  
         // set all resources to be loaded
         me.loader.onload = this.loaded.bind(this);
@@ -140,6 +146,7 @@ var PlayScreen = me.ScreenObject.extend({
         me.game.HUD.setItemValue("scorelbl", "score:");
         me.game.HUD.setItemValue("score", 0);
         me.game.HUD.setItemValue("message", "");
+        me.audio.playTrack("Calmtown");
     },
  
     onDestroyEvent: function() {
@@ -184,9 +191,10 @@ var MenuScreen = me.ScreenObject.extend({
         context.drawImage(this.title, 0, 0);
         if (!me.game.STATE.playerIsAlive) {
             this.font.draw(context, "You Just Lost The Game!", 100, 300);
+            me.game.STATE.health = 100;
         } else if (me.game.STATE.gameIsWon) {
             this.font.draw(context, "YOU WON!!", 200, 300);
-            this.game.HUD.updateItemValue("message", "");
+            me.game.HUD.updateItemValue("message", "");
         }
         this.font.draw(context, "Pixel Quest", 235 ,225);
         this.fontxsm.draw(context, "a Liberated Pixel Cup Game", 450, 250);
@@ -232,7 +240,7 @@ var PlayerEntity = me.ObjectEntity.extend({
 
         this.updateColRect(16,32,10,54);
         this.setVelocity(0,0);
-        this.setFriction(0.22, 0.22);
+        this.setFriction(0.5, 0.5);
         this.gravity = 0;
         this.direction = "south";
         
@@ -343,7 +351,7 @@ var PlayerEntity = me.ObjectEntity.extend({
 
         } else {
             this.isFiring = false;
-            this.setVelocity(2,2);
+            this.setVelocity(3,3);
         }
         var currentAnimation = "";
 
@@ -464,6 +472,7 @@ var FireMage = me.ObjectEntity.extend({
         this.type = me.game.FRIEND_OBJECT;
     },
     onCollision: function(res, obj) {
+        
         if (obj.type === me.game.PLAYER_MAIN) {
             me.game.STATE.messageIsShowing = true;
             me.game.HUD.updateItemValue("message", "Moashiin, for your troubles, the powers of fire and ice." );
@@ -513,7 +522,6 @@ var RoyalMage = me.ObjectEntity.extend({
 
 var FriendEntity = me.ObjectEntity.extend({
     init: function(x, y, settings) {
-        //settings.image = "forest_mage";
         settings.spritewidth = 64;
         settings.spriteheight = 64;
 
@@ -533,7 +541,6 @@ var FriendEntity = me.ObjectEntity.extend({
         if (obj.type === me.game.PLAYER_MAIN) {
             me.game.STATE.messageIsShowing = true;
             me.game.HUD.updateItemValue("message","Moashiin, there are enemies around, defend yourself with spacebar" );
-         //   me.game.STATE["weaponState"] = "magic_torrentacle";
         }
 
     },
@@ -546,7 +553,6 @@ var FriendEntity = me.ObjectEntity.extend({
 
 var RedNovice = me.ObjectEntity.extend({
     init: function(x, y, settings) {
-        //settings.image = "forest_mage";
         settings.spritewidth = 64;
         settings.spriteheight = 64;
 
@@ -584,10 +590,9 @@ var FlyingEnemy = me.ObjectEntity.extend( {
 
         this.parent(x, y, settings);
         
-        //this.updateColRect(16,32,10,54);
 
         this.gravity = 0;
-        this.setVelocity(0.5,1);
+        this.setVelocity(1.5,1.5);
 
         this.addAnimation("stand-n", [0]);
         this.addAnimation("stand-s", [6]);
@@ -616,9 +621,9 @@ var FlyingEnemy = me.ObjectEntity.extend( {
 
     },
     onCollision: function(res, obj) {
-        //we should do something here
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
             me.game.HUD.updateItemValue("score", 5);
+            me.audio.play("closing-umbrella");
             var damage = me.game.STATE.weaponState === "firelion" ? 2 : 0.5;
             this.health = this.health - damage;
             if (this.health === 0) {
@@ -682,7 +687,7 @@ var EnemyEntity = me.ObjectEntity.extend({
         this.updateColRect(16,32,10,54);
 
         this.gravity = 0;
-        this.setVelocity(0.5,1);
+        this.setVelocity(1,1);
 
         this.addAnimation("stand-n", [0]);
         this.addAnimation("stand-s", [18]);
@@ -711,9 +716,9 @@ var EnemyEntity = me.ObjectEntity.extend({
 
     },
     onCollision: function(res, obj) {
-        //we should do something here
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
             me.game.HUD.updateItemValue("score", 5);
+            me.audio.play("chomp");
             var damage = me.game.STATE.weaponState === "firelion" ? 2 : 0.5;
             this.health = this.health - damage;
             if (this.health === 0) {

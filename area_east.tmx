@@ -58,7 +58,7 @@
     <property name="to" value="area0_e"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="1093" y="870" width="418" height="115">
+  <object name="EnemyEntity" x="1094" y="887" width="407" height="83">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
@@ -95,7 +95,7 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="639" y="680" width="378" height="353">
+  <object name="EnemyEntity" x="760" y="669" width="198" height="299">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
@@ -109,7 +109,7 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="FlyingEnemy" x="295" y="675" width="316" height="288">
+  <object name="FlyingEnemy" x="339" y="758" width="532" height="206">
    <properties>
     <property name="image" value="bat"/>
     <property name="spriteheight" value="32"/>
