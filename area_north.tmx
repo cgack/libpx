@@ -51,21 +51,21 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="109" y="202" width="294" height="286">
+  <object name="EnemyEntity" x="52" y="60" width="284" height="820">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="249" y="340" width="294" height="286">
+  <object name="EnemyEntity" x="45" y="151" width="516" height="343">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="125" y="587" width="294" height="286">
+  <object name="EnemyEntity" x="68" y="601" width="557" height="290">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
@@ -79,21 +79,21 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="1594" y="618" width="294" height="286">
+  <object name="EnemyEntity" x="1510" y="622" width="294" height="286">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="1136" y="587" width="294" height="286">
+  <object name="EnemyEntity" x="959" y="744" width="409" height="146">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
-  <object name="EnemyEntity" x="659" y="680" width="101" height="89">
+  <object name="EnemyEntity" x="659" y="680" width="166" height="213">
    <properties>
     <property name="image" value="malesoldierzombie"/>
     <property name="spriteheight" value="64"/>

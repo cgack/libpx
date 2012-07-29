@@ -109,6 +109,41 @@
     <property name="spritewidth" value="64"/>
    </properties>
   </object>
+  <object name="FlyingEnemy" x="295" y="675" width="316" height="288">
+   <properties>
+    <property name="image" value="bat"/>
+    <property name="spriteheight" value="32"/>
+    <property name="spritewidth" value="32"/>
+   </properties>
+  </object>
+  <object name="FlyingEnemy" x="63" y="1350" width="551" height="416">
+   <properties>
+    <property name="image" value="bat"/>
+    <property name="spriteheight" value="32"/>
+    <property name="spritewidth" value="32"/>
+   </properties>
+  </object>
+  <object name="FlyingEnemy" x="944" y="668" width="462" height="323">
+   <properties>
+    <property name="image" value="bat"/>
+    <property name="spriteheight" value="32"/>
+    <property name="spritewidth" value="32"/>
+   </properties>
+  </object>
+  <object name="FlyingEnemy" x="1121" y="608" width="382" height="115">
+   <properties>
+    <property name="image" value="bat"/>
+    <property name="spriteheight" value="32"/>
+    <property name="spritewidth" value="32"/>
+   </properties>
+  </object>
+  <object name="FlyingEnemy" x="1284" y="887" width="323" height="60">
+   <properties>
+    <property name="image" value="bat"/>
+    <property name="spriteheight" value="32"/>
+    <property name="spritewidth" value="32"/>
+   </properties>
+  </object>
  </objectgroup>
  <layer name="collision" width="90" height="60">
   <data encoding="base64">
