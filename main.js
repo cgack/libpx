@@ -47,7 +47,7 @@ var g_resources = [
     {   name: "hole", type: "image", src: "assets/hole.png" },
     {   name: "dirt2",        type: "image",        src: "assets/dirt2.png"    },
     /* sfx */
-    {   name: "Calmtown", type: "audio", src:"sfx/", channel: 1 },
+    {   name: "calmtown", type: "audio", src:"sfx/", channel: 1 },
     {   name: "chomp", type: "audio", src:"sfx/", channel: 2},
     {   name: "closing-umbrella", type: "audio", src: "sfx/", channel: 2 },
     {   name: "metal-bowl", type: "audio", src: "sfx/", channel: 2 }
@@ -146,7 +146,8 @@ var PlayScreen = me.ScreenObject.extend({
         me.game.HUD.setItemValue("scorelbl", "score:");
         me.game.HUD.setItemValue("score", 0);
         me.game.HUD.setItemValue("message", "");
-        me.audio.playTrack("Calmtown");
+        me.audio.playTrack("calmtown");
+
     },
  
     onDestroyEvent: function() {
