@@ -64,7 +64,7 @@ var jsApp = {
             return;
         }
         me.sys.useNativeAnimFrame = true;
-        me.sys.fps = 30;
+        me.sys.fps = 60;
         //me.debug.renderHitBox = true;
         // initialize the "audio"
         me.audio.init("mp3,ogg");
@@ -91,7 +91,8 @@ var jsApp = {
             gameIsWon: false,
             messageIsShowing: false,
             weaponState: null,
-            cupKnowledge: false
+            cupKnowledge: false,
+            health: 100
         };
         me.state.set(me.state.MENU, new MenuScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
@@ -234,7 +235,6 @@ var PlayerEntity = me.ObjectEntity.extend({
         this.setFriction(0.22, 0.22);
         this.gravity = 0;
         this.direction = "south";
-        this.health = 100;
         
         this.addAnimation("stand-n", [0]);
         this.addAnimation("stand-s", [18]);
@@ -263,7 +263,7 @@ var PlayerEntity = me.ObjectEntity.extend({
 
     },
     update: function() {
-         if (this.health === 0) {
+         if (me.game.STATE.health <= 0) {
             me.game.STATE.playerIsAlive = false;
             me.state.change(me.game.LOSE);
         }
@@ -279,9 +279,9 @@ var PlayerEntity = me.ObjectEntity.extend({
                     }
                     if (!this.flickering) {
 
-                        me.game.HUD.updateItemValue("health", - 10);
-                        this.health = this.health  - 10;
-                        if (this.health === 0) {
+                        me.game.HUD.updateItemValue("health", -10);
+                        me.game.STATE.health = me.game.STATE.health  - 10;
+                        if (me.game.STATE.health === 0) {
                             me.game.STATE.playerIsAlive = false;
                             me.state.change(me.game.LOSE);
                         }
@@ -533,7 +533,7 @@ var FriendEntity = me.ObjectEntity.extend({
         if (obj.type === me.game.PLAYER_MAIN) {
             me.game.STATE.messageIsShowing = true;
             me.game.HUD.updateItemValue("message","Moashiin, there are enemies around, defend yourself with spacebar" );
-            me.game.STATE["weaponState"] = "magic_torrentacle";
+         //   me.game.STATE["weaponState"] = "magic_torrentacle";
         }
 
     },

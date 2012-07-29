@@ -8149,7 +8149,7 @@
 
 	/**
 	 * manage game statistics<p>
-	 * me.gamestat can be used to store useful values during the game<p>
+	 * meA can be used to store useful values during the game<p>
 	 * there is no constructor for me.gamestat
 	 * @final
 	 * @memberOf me
