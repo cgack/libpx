@@ -1,0 +1,70 @@
+Code authors
+============
+
+This program was written by the following people:
+- Cory Gackenheimer
+
+
+Asset attribution
+=================
+
+Assets were authored by the following people:
+
+Lanea Zimmerman
+ - barrel.png
+ - cabinets.png
+ - country.png
+ - cup.png
+ - dirt.png
+ - dirt2.png
+ - grass.png
+ - hole.png
+ - house.png
+ - inside.png
+ - lava.png
+ - lavarock.png
+ - treetop.png
+ - trunk.png
+ - waterfall.png
+ - watergrass.png
+ - water.png
+ - lpc_home_cup.gif //co-author
+
+Jonathan Palecek (Creative Commons)
+ - lpc_home_cup.gif //co-author
+
+
+Charles Sanchez
+ - bat.png
+
+Barbara Rivera
+ - malesoldierzombie.png
+ - malesoldiernormal.png
+
+Brandon
+ - Calm Town (music) calmtown.ogg
+
+Daniel Eddeland
+ - fence.png
+ - magic_firelion_sheet.png
+ - magic_iceshield_sheet.png
+ - magic_torrentacle.png
+
+Johann CHARLOT
+ - tileset01.png
+
+Johnathan Roatch
+ - chomp.flac (sfx)
+ - chomp.ogg (coverted from flac)
+ - closing-umbrella.flac (sfx)
+ - closing-umbrella.ogg (coverted from flac)
+ - metal-bowl.flac (sfx)
+ - metal-bowl.ogg (coverted from flac)
+
+Luke Mehl
+ - dark_mage_elder.png
+ - dark_mage_queen.png
+ - forest_mage.png
+ - gray_mage.png
+ - red_novice.png
+ - royal_mage.png
