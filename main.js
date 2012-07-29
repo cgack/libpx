@@ -146,7 +146,7 @@ var PlayScreen = me.ScreenObject.extend({
         me.game.HUD.setItemValue("scorelbl", "score:");
         me.game.HUD.setItemValue("score", 0);
         me.game.HUD.setItemValue("message", "");
-        me.audio.playTrack("Calmtown");
+//me.audio.playTrack("Calmtown");
     },
  
     onDestroyEvent: function() {
@@ -623,7 +623,7 @@ var FlyingEnemy = me.ObjectEntity.extend( {
     onCollision: function(res, obj) {
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
             me.game.HUD.updateItemValue("score", 5);
-            me.audio.play("closing-umbrella");
+           // me.audio.play("closing-umbrella");
             var damage = me.game.STATE.weaponState === "firelion" ? 2 : 0.5;
             this.health = this.health - damage;
             if (this.health === 0) {
@@ -718,7 +718,7 @@ var EnemyEntity = me.ObjectEntity.extend({
     onCollision: function(res, obj) {
         if (me.game.getEntityByName("mainPlayer")[0].isFiring && obj.type == me.game.PLAYER_MAIN) {
             me.game.HUD.updateItemValue("score", 5);
-            me.audio.play("chomp");
+          //  me.audio.play("chomp");
             var damage = me.game.STATE.weaponState === "firelion" ? 2 : 0.5;
             this.health = this.health - damage;
             if (this.health === 0) {
