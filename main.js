@@ -1,3 +1,21 @@
+/**********************************************************************
+* Pixel Quest - a Liberated Pixel Cup HTML5 Game
+* Copyright (C) 2012  Cory Gackenheimer
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+***********************************************************************/
+
 // game resources
 var g_resources = [
     /* maps */
@@ -25,7 +43,6 @@ var g_resources = [
     {   name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
     {   name: "magic_torrentacle", type: "image", src: "assets/magic/magic_torrentacle.png" },
     {   name: "magic_iceshield_sheet", type: "image", src: "assets/magic/magic_iceshield_sheet.png"},
-    {   name: "32x32_font",        type: "image",        src: "assets/32x32_font.png"    },
     {   name: "metatiles32x32",        type: "image",        src: "assets/metatiles32x32.png"    },
     {   name: "tileset01",        type: "image",        src: "assets/tileset01.png"    },
     {   name: "water",        type: "image",        src: "assets/water.png"    },
@@ -70,7 +87,7 @@ var jsApp = {
         }
         //TODO: fix useNativeAnimFrame to not increase velocities on reload of levels
         //me.sys.useNativeAnimFrame = true;
-        me.sys.fps = 60;
+        me.sys.fps = 30;
         //me.debug.renderHitBox = true;
         // initialize the "audio"
         me.audio.init("ogg");
@@ -147,7 +164,6 @@ var PlayScreen = me.ScreenObject.extend({
         me.game.HUD.setItemValue("score", 0);
         me.game.HUD.setItemValue("message", "");
         me.audio.playTrack("calmtown");
-
     },
  
     onDestroyEvent: function() {
