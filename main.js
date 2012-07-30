@@ -25,7 +25,6 @@ var g_resources = [
     {   name: "magic_firelion_sheet",        type: "image",        src: "assets/magic/magic_firelion_sheet.png"    },
     {   name: "magic_torrentacle", type: "image", src: "assets/magic/magic_torrentacle.png" },
     {   name: "magic_iceshield_sheet", type: "image", src: "assets/magic/magic_iceshield_sheet.png"},
-    {   name: "32x32_font",        type: "image",        src: "assets/32x32_font.png"    },
     {   name: "metatiles32x32",        type: "image",        src: "assets/metatiles32x32.png"    },
     {   name: "tileset01",        type: "image",        src: "assets/tileset01.png"    },
     {   name: "water",        type: "image",        src: "assets/water.png"    },
