@@ -1865,17 +1865,19 @@
 					_animFrameId = window.requestAnimFrame(_renderFrame);
 
 					if (_animFrameId != -1) {
-						return;
+						window.setTimeout(_activeUpdateFrame, _fps);
+						//return;
 					}
 					// else feature not supported !
 
 					// disable use of requestAnimationFrame (since unsupported)
 					me.sys.useNativeAnimFrame = false;
 					//console.log("using setInterval as fallback ("+_animFrameId+")");
-				}
+				} else {
 
-				// setup the game loop using setInterval
-				_intervalId = setInterval(_activeUpdateFrame, _fps);
+					// setup the game loop using setInterval
+					_intervalId = setInterval(_activeUpdateFrame, _fps);
+				}
 			}
 		}
 		;
@@ -1885,10 +1887,11 @@
 		 * this is only called when using requestAnimFrame stuff
 		 */
 		function _renderFrame() {
+
+			window.requestAnimFrame(_renderFrame);
 			_activeUpdateFrame();
 			// we already checked it was supported earlier
 			// so no need to do it again here
-			window.requestAnimFrame(_renderFrame);
 		}
 		;
 

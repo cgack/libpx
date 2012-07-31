@@ -86,8 +86,9 @@ var jsApp = {
             return;
         }
         //TODO: fix useNativeAnimFrame to not increase velocities on reload of levels
-        //me.sys.useNativeAnimFrame = true;
-        me.sys.fps = 30;
+        me.sys.useNativeAnimFrame = true;
+        me.sys.fps = 60;
+
         //me.debug.renderHitBox = true;
         // initialize the "audio"
         me.audio.init("ogg");
